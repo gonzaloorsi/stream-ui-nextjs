@@ -1,24 +1,30 @@
 "use client";
 
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { streamComponent } from "./actions";
+import { useChat } from "ai/react";
 
-function Page() {
-  const [component, setComponent] = useState<React.ReactNode>();
+export default function Page() {
+  const { messages, input, handleInputChange, handleSubmit, isLoading } =
+    useChat({
+      api: "api/chat",
+    });
 
   return (
-    <div>
-      <form
-        onSubmit={async (e) => {
-          e.preventDefault();
-          setComponent(await streamComponent());
-        }}
-      >
-        <Button>Stream component</Button>
+    <>
+      {messages.map((message) => (
+        <div key={message.id}>
+          {message.role === "user" ? "User: " : "AI: "}
+          {message.content}
+        </div>
+      ))}
+      <form onSubmit={handleSubmit}>
+        <input
+          name="prompt"
+          value={input}
+          onChange={handleInputChange}
+          id="input"
+        />
+        <button type="submit">Submit</button>
       </form>
-      <div>{component}</div>
-    </div>
+    </>
   );
 }
-export default Page;
